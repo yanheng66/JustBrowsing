@@ -1,0 +1,10 @@
+{
+    "namespace": "com.ecommerce.events",
+    "type": "record",
+    "name": "ProductDeletedEvent",
+    "fields": [
+        {"name": "productId", "type": "string"},
+        {"name": "sku", "type": "string"},
+        {"name": "deletedAt", "type": "string"}
+    ]
+}

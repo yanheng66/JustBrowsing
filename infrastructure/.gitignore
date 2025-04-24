@@ -1,0 +1,121 @@
+# Terraform .gitignore
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+.terraform.lock.hcl
+.terragrunt-cache/
+terraform.out
+.terraform-version
+
+# Docker .gitignore
+docker-compose.override.yml
+docker-data/
+docker-volumes/
+.docker/
+docker-compose-*.yml
+!docker-compose.yml
+!docker-compose.example.yml
+!docker-compose.dev.yml
+!docker-compose.monitoring.yml
+
+# Monitoring data
+**/prometheus/data/
+**/grafana/data/
+**/elasticsearch/data/
+**/kibana/data/
+**/logstash/data/
+**/jaeger/data/
+**/prometheus_data/
+**/grafana_data/
+**/elasticsearch_data/
+**/kibana_data/
+**/logstash_data/
+**/jaeger_data/
+
+# Generated files and directories
+**/databases/postgres/data/
+**/databases/mongodb/data/
+**/databases/redis/data/
+**/services/nginx/logs/
+**/zookeeper/data/
+**/kafka/data/
+**/kafka/logs/
+*.gz
+*.tar
+*.zip
+
+# Environment files
+*.env
+.env.*
+!default.env
+!example.env
+!.env.example
+
+# SSH keys and certificates
+*.pem
+*.key
+*.crt
+*.ca
+*.p12
+*.pfx
+*.cer
+id_rsa
+id_dsa
+known_hosts
+
+# Secrets
+*secret*
+*credential*
+*password*
+*token*
+*apikey*
+*api_key*
+kubeconfig
+.kube/
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+
+# Log files
+*.log
+logs/
+output.log
+error.log
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Ansible files
+*.retry
+inventory/hosts.yml
+ansible.cfg
+
+# Custom scripts and utilities
+scripts/local/

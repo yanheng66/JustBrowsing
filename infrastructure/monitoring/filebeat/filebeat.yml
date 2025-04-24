@@ -1,0 +1,58 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      templates:
+        - condition:
+            contains:
+              docker.container.name: "command-service"
+          config:
+            - type: container
+              paths:
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+              json.message_key: log
+              json.keys_under_root: true
+              processors:
+                - add_docker_metadata: ~
+                - add_fields:
+                    target: "service"
+                    fields:
+                      name: "command-service"
+        - condition:
+            contains:
+              docker.container.name: "query-service"
+          config:
+            - type: container
+              paths:
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+              json.message_key: log
+              json.keys_under_root: true
+              processors:
+                - add_docker_metadata: ~
+                - add_fields:
+                    target: "service"
+                    fields:
+                      name: "query-service"
+        - condition:
+            contains:
+              docker.container.name: "api-gateway"
+          config:
+            - type: container
+              paths:
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+              processors:
+                - add_docker_metadata: ~
+                - add_fields:
+                    target: "service"
+                    fields:
+                      name: "api-gateway"
+
+processors:
+  - add_host_metadata: 
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+output.logstash:
+  hosts: ["logstash:5044"]

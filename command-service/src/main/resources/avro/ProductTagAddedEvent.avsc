@@ -1,0 +1,12 @@
+{
+    "namespace": "com.ecommerce.events",
+    "type": "record",
+    "name": "ProductTagAddedEvent",
+    "fields": [
+        {"name": "productId", "type": "string"},
+        {"name": "tagId", "type": "string"},
+        {"name": "tagName", "type": "string"},
+        {"name": "tagValue", "type": "string"},
+        {"name": "timestamp", "type": "string"}
+    ]
+}

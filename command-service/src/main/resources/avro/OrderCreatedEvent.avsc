@@ -1,0 +1,22 @@
+{
+    "namespace": "com.ecommerce.events",
+    "type": "record",
+    "name": "OrderCreatedEvent",
+    "fields": [
+        {"name": "orderId", "type": "string"},
+        {"name": "orderNumber", "type": "string"},
+        {"name": "totalAmount", "type": "double"},
+        {"name": "createdAt", "type": "string"},
+        {"name": "items", "type": {"type": "array", "items": {
+            "type": "record",
+            "name": "OrderItemData",
+            "fields": [
+                {"name": "itemId", "type": "string"},
+                {"name": "productId", "type": "string"},
+                {"name": "quantity", "type": "int"},
+                {"name": "unitPrice", "type": "double"},
+                {"name": "totalPrice", "type": "double"}
+            ]
+        }}}
+    ]
+}

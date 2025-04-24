@@ -1,0 +1,11 @@
+{
+    "namespace": "com.ecommerce.events",
+    "type": "record",
+    "name": "ProductTagRemovedEvent",
+    "fields": [
+        {"name": "productId", "type": "string"},
+        {"name": "tagId", "type": "string"},
+        {"name": "tagName", "type": "string"},
+        {"name": "timestamp", "type": "string"}
+    ]
+}

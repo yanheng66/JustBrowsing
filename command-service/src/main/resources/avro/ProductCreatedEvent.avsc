@@ -1,0 +1,22 @@
+{
+    "namespace": "com.ecommerce.events",
+    "type": "record",
+    "name": "ProductCreatedEvent",
+    "fields": [
+        {"name": "productId", "type": "string"},
+        {"name": "sku", "type": "string"},
+        {"name": "name", "type": "string"},
+        {"name": "description", "type": ["null", "string"], "default": null},
+        {"name": "price", "type": "double"},
+        {"name": "createdAt", "type": "string"},
+        {"name": "tags", "type": {"type": "array", "items": {
+            "type": "record",
+            "name": "TagData",
+            "fields": [
+                {"name": "tagId", "type": "string"},
+                {"name": "name", "type": "string"},
+                {"name": "value", "type": "string"}
+            ]
+        }}, "default": []}
+    ]
+}

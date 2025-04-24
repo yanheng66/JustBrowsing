@@ -1,0 +1,93 @@
+# NGINX specific .gitignore
+# Configuration backups
+*.bak
+*.old
+*.orig
+*.rej
+
+# SSL certificates and keys (should not be committed)
+*.crt
+*.key
+*.pem
+*.csr
+dhparam.pem
+ssl/
+certificates/
+
+# Logs
+logs/
+*.log
+error.log
+access.log
+nginx-access.log
+nginx-error.log
+
+# Runtime data
+*.pid
+*.sock
+run/
+
+# Environment variables
+.env
+*.env
+.env.*
+!default.env
+
+# Docker related
+.docker/
+docker-compose.override.yml
+docker-data/
+
+# Ignore cache directories
+cache/
+proxy_temp/
+fastcgi_temp/
+uwsgi_temp/
+scgi_temp/
+client_body_temp/
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Generated configuration files (if they are generated from templates)
+/nginx.conf
+/api-gateway.conf
+/*.conf
+!nginx.conf.template
+!default.conf.template
+!nginx.conf.d/
+!conf.d/
+
+# Temporary files
+temp/
+tmp/
+
+# Credentials and secrets
+*secret*
+*credential*
+*password*
+*token*
+htpasswd
+
+# Generated files
+html/
+www/
+public/
+metrics/
+
+# Build artifacts
+build/
+dist/

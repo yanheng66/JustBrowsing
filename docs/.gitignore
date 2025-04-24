@@ -1,0 +1,93 @@
+# Docs specific .gitignore
+# Generated documentation
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+site/
+public/
+node_modules/
+.docusaurus/
+.cache/
+.hugo_build.lock
+
+# Static site generators
+.hugo/
+.jekyll/
+.mkdocs/
+.docusaurus/
+.vuepress/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+*.tmp
+
+# Build files
+build/
+dist/
+out/
+output/
+generated/
+
+# Sensitive information
+*-credentials.*
+*credentials*.*
+*secret*.*
+*token*.*
+*password*.*
+*key*.*
+*private*.*
+
+# Draft and WIP documents
+*_draft.*
+*_wip.*
+*DRAFT*
+*WIP*
+draft/
+drafts/
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.bak
+*.backup
+
+# Personal notes and TODO items
+notes.md
+TODO.md
+NOTES.txt
+TODO.txt
+*.taskpaper
+*.todo
+INTERNAL.md
+PRIVATE.md
+
+# Images and large binary files that should be explicitly added
+# (add with git add -f if needed)
+*.psd
+*.ai
+*.sketch
+*.fig
+*.xd
+*.pdf
+*.zip
+*.mov
+*.mp4
+*.pptx
+*.xlsx
+*.docx
+*-assets/raw/

@@ -1,0 +1,72 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Logs ###
+logs/
+*.log
+
+### OS ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+### Configuration ###
+/src/main/resources/application-local.properties
+/src/main/resources/application-dev.properties
+/src/main/resources/application-test.properties
+/src/main/resources/application-*.properties
+!/src/main/resources/application.properties
+!/src/main/resources/application-example.properties
+
+### Compiled class files ###
+*.class
+
+### Package files ###
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+!.mvn/wrapper/maven-wrapper.jar
+
+### Avro generated sources ###
+/src/main/java/**/avro/generated/
+
+### Local Maven repository ###
+.m2/repository/

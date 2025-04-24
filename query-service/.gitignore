@@ -1,0 +1,103 @@
+# Go project specific .gitignore
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+vendor/
+
+# Go workspace file
+go.work
+
+# Binary output directory
+/bin/
+/dist/
+/tmp/
+/temp/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+*.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Debug files
+debug
+__debug_bin
+
+# Log files
+*.log
+logs/
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Configuration files with potential secrets (add them to git with -f if needed)
+/config.yaml
+/config.local.yaml
+config.*.yaml
+!config.example.yaml
+
+# Certificates and credentials
+*.pem
+*.key
+*.crt
+*.ca
+*secret*
+*credential*
+*password*
+*token*
+
+# Test cache and coverage
+.testCoverage.txt
+coverage.html
+coverage.out
+profile.out
+
+# AIR live reload
+.air.toml
+tmp/
+
+# Generated OpenAPI documentation
+swagger-ui/
+swagger.json
+swagger.yaml
+api/docs/swagger.json
+api/docs/swagger.yaml
+
+# Compiled binaries
+/query-service
+main
+
+# MongoDB data directory (if used locally)
+/data/db/
+
+# Redis data (if used locally)
+/data/redis/
+
+# Kafka local data (if used locally)
+/data/kafka/

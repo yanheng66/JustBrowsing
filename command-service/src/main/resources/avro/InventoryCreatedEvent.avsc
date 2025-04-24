@@ -1,0 +1,12 @@
+{
+    "namespace": "com.ecommerce.events",
+    "type": "record",
+    "name": "InventoryCreatedEvent",
+    "fields": [
+        {"name": "inventoryId", "type": "string"},
+        {"name": "productId", "type": "string"},
+        {"name": "quantity", "type": "int"},
+        {"name": "version", "type": "int"},
+        {"name": "createdAt", "type": "string"}
+    ]
+}

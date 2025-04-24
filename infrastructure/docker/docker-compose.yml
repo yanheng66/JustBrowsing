@@ -1,0 +1,273 @@
+version: '3.8'
+
+networks:
+  ecommerce-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  mongodb-data:
+  elasticsearch-data:
+  redis-data:
+  zookeeper-data:
+  kafka-data:
+  prometheus-data:
+  grafana-data:
+  elasticsearch-logs:
+  kibana-data:
+  jaeger-data:
+
+services:
+  # ========== Databases ==========
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./databases/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: ecommerce
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - mongodb-data:/data/db
+      - ./databases/mongodb/init.js:/docker-entrypoint-initdb.d/init.js
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/ecommerce --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+    command: ["--wiredTigerCacheSizeGB", "0.25"]
+    networks:
+      - ecommerce-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+      - ./databases/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    networks:
+      - ecommerce-network
+
+  # ========== Messaging ==========
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+    healthcheck:
+      test: nc -z localhost 2181 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx512m"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: nc -z localhost 9092 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.4.0
+    container_name: schema-registry
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    healthcheck:
+      test: curl --silent --fail http://localhost:8081/subjects || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  # ========== Search ==========
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: curl -s http://localhost:9200/_cluster/health | grep -q 'status":"green\|status":"yellow'
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    networks:
+      - ecommerce-network
+
+  # ========== Services ==========
+  command-service:
+    build:
+      context: ../../command-service
+      dockerfile: Dockerfile
+    container_name: command-service
+    depends_on:
+      - postgres
+      - kafka
+      - schema-registry
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ecommerce
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_PRODUCER_PROPERTIES_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    healthcheck:
+      test: curl --fail http://localhost:8080/api/commands/actuator/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  query-service:
+    build:
+      context: ../../query-service
+      dockerfile: Dockerfile
+    container_name: query-service
+    depends_on:
+      - mongodb
+      - kafka
+      - elasticsearch
+      - redis
+    ports:
+      - "8081:8081"
+    environment:
+      MONGODB_URI: mongodb://admin:admin@mongodb:27017
+      MONGODB_DATABASE: ecommerce
+      ELASTICSEARCH_ADDRESSES: http://elasticsearch:9200
+      REDIS_ADDRESS: redis:6379
+      KAFKA_BROKERS: kafka:9092
+      GOMAXPROCS: 1
+    healthcheck:
+      test: curl --fail http://localhost:8081/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  api-gateway:
+    image: nginx:alpine
+    container_name: api-gateway
+    depends_on:
+      - command-service
+      - query-service
+    ports:
+      - "80:80"
+    volumes:
+      - ../../api-gateway/nginx/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
+      - ./services/nginx/logs:/var/log/nginx
+    environment:
+      - NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+      - SERVER_NAME=localhost
+      - COMMAND_SERVICE_HOST_1=command-service
+      - COMMAND_SERVICE_PORT_1=8080
+      - COMMAND_SERVICE_HOST_2=command-service
+      - COMMAND_SERVICE_PORT_2=8080
+      - QUERY_SERVICE_HOST_1=query-service
+      - QUERY_SERVICE_PORT_1=8081
+      - QUERY_SERVICE_HOST_2=query-service
+      - QUERY_SERVICE_PORT_2=8081
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+
+  # Include other services (monitoring, etc.) via docker-compose files
